@@ -8,6 +8,7 @@ TagManager:
   - EndTrigger
   - Ground
   - Enemy
+  - Punch
   layers:
   - Default
   - TransparentFX

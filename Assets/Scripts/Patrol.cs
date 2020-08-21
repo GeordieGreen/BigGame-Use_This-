@@ -58,7 +58,7 @@ public class Patrol : MonoBehaviour
             }
             else
             {
-                currentWait = Time.deltaTime;
+                currentWait -= Time.deltaTime;
             }
         }
     }

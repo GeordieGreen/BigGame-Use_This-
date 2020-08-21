@@ -16,6 +16,7 @@ public class PlayerMovement : MonoBehaviour
     public float doubleJump = 0.5f;
 
     public Animator anim;
+    public GameObject punchTrigger;
 
     float coinCounter;
     float directionY;
@@ -32,6 +33,7 @@ public class PlayerMovement : MonoBehaviour
         anim = GetComponent<Animator>();
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+        punchTrigger.SetActive(false);
         
     }
 
@@ -83,7 +85,6 @@ public class PlayerMovement : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 directionY = jumpForce;
-                
             }
         }
         else
@@ -104,12 +105,17 @@ public class PlayerMovement : MonoBehaviour
         {
             anim.SetBool("isJumping", false);
         }
-        
-        
+
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             speed = 20f;
             anim.SetBool("isSprinting", true);
+
+            if (Input.GetMouseButton(0))
+            {
+                anim.SetTrigger("isRunPunch");
+                punchTrigger.SetActive(true);
+            }
             //anim.SetBool("isWalking", false);
         }
         else if (Input.GetKeyUp(KeyCode.LeftShift))
@@ -119,7 +125,32 @@ public class PlayerMovement : MonoBehaviour
             anim.SetBool("isWalking", true);
         }
 
-        
+        if (Input.GetMouseButton(0))
+        {
+            Debug.Log("Click mouse");
+
+            if (anim.GetBool("isWalking") == true || anim.GetBool("isSprinting") == true)
+            {
+                Debug.Log("Run punch");
+
+                anim.SetTrigger("isRunPunch");
+                punchTrigger.SetActive(true);
+            }
+
+            if (anim.GetBool("isWalking") == false && anim.GetBool("isSprinting") == false)
+            {
+                Debug.Log("Walk punch");
+
+                anim.SetTrigger("isPunching");
+                punchTrigger.SetActive(true);
+            }
+        }
+
+
+        else
+        {
+            punchTrigger.SetActive(false);
+        }
 
         directionY -= gravity * Time.deltaTime;
 
@@ -131,6 +162,7 @@ public class PlayerMovement : MonoBehaviour
         {
             SceneManager.LoadScene("DeathScreen");
         }
+
 
     }
 
@@ -157,6 +189,33 @@ public class PlayerMovement : MonoBehaviour
         {
             playerHitPoints -= playerDamage;
             print(playerHitPoints);
+            anim.SetBool("isHit", true);
+        }
+        
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Enemy")
+        {
+            anim.SetBool("isHit", false);
+            
         }
     }
+    //private void OnMouseDown()
+   // {
+       // if (anim.GetBool("isWalking") == true)
+       // {
+       //     anim.SetTrigger("isRunPunch");
+       //     punchTrigger.SetActive(true);
+       // }
+
+       // if (anim.GetBool("isWalking") == false && anim.GetBool("isSprinting") == false)
+       // {
+       //     anim.SetTrigger("isPunching");
+          //  punchTrigger.SetActive(true);
+       // }
+       
+    //}
+    
+
 }
