@@ -9,6 +9,7 @@ TagManager:
   - Ground
   - Enemy
   - Punch
+  - Burger
   layers:
   - Default
   - TransparentFX

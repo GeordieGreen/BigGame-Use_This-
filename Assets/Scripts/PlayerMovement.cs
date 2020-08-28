@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
 
     private CharacterController controller;
 
-    [SerializeField] int playerHitPoints = 100;
+    public int playerHitPoints = 100;
     [SerializeField] int playerDamage = 10;
+    [SerializeField] int healthUp = 5;
     [SerializeField] float speed = 5.0f;
+
     public float gravity = 9.81f;
     public float jumpForce = 30f;
     public float doubleJump = 0.5f;
@@ -18,7 +21,7 @@ public class PlayerMovement : MonoBehaviour
     public Animator anim;
     public GameObject punchTrigger;
 
-    float coinCounter;
+    public float coinCounter;
     float directionY;
 
     private bool isDoubleJump = false;
@@ -40,129 +43,141 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-        float xMovement = Input.GetAxisRaw("Horizontal");
-        
-        float yMovement = Input.GetAxisRaw("Vertical");
+        if (!Pause.isPaused)
+        {
+            float xMovement = Input.GetAxisRaw("Horizontal");
+
+            float yMovement = Input.GetAxisRaw("Vertical");
 
 
-        if (Input.GetKey(KeyCode.W))
-        {
-            anim.SetBool("isWalking",true);
-        }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            anim.SetBool("isWalking", true);
-        }
-        else if (Input.GetKey(KeyCode.A))
-        {
-            anim.SetBool("isWalking", true);
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            anim.SetBool("isWalking", true);
-        }
-        else
-        {
-            anim.SetBool("isWalking", false);
-        }
-
-        Vector3 rightWorldMovement = cam.transform.right;
-        Vector3 forwardWorldMovement = cam.transform.forward;
-        forwardWorldMovement.y = 0;
-        forwardWorldMovement.Normalize();
-        
-
-        Vector3 worldMoveInput = Vector3.ClampMagnitude(rightWorldMovement * xMovement + forwardWorldMovement * yMovement, 1);
-        if (worldMoveInput != Vector3.zero)
-        {
-            transform.rotation = Quaternion.LookRotation(worldMoveInput);
-        }
-
-        if (controller.isGrounded)
-        {
-            isDoubleJump = true;
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKey(KeyCode.W))
             {
-                directionY = jumpForce;
+                anim.SetBool("isWalking", true);
             }
-        }
-        else
-        {
-            if (Input.GetKeyDown(KeyCode.Space) && isDoubleJump)
+            else if (Input.GetKey(KeyCode.S))
             {
-                directionY = jumpForce * doubleJump;
-                isDoubleJump = false;
+                anim.SetBool("isWalking", true);
+            }
+            else if (Input.GetKey(KeyCode.A))
+            {
+                anim.SetBool("isWalking", true);
+            }
+            else if (Input.GetKey(KeyCode.D))
+            {
+                anim.SetBool("isWalking", true);
+            }
+            else
+            {
+                anim.SetBool("isWalking", false);
+            }
+
+            Vector3 rightWorldMovement = cam.transform.right;
+            Vector3 forwardWorldMovement = cam.transform.forward;
+            forwardWorldMovement.y = 0;
+            forwardWorldMovement.Normalize();
+
+
+            Vector3 worldMoveInput = Vector3.ClampMagnitude(rightWorldMovement * xMovement + forwardWorldMovement * yMovement, 1);
+            if (worldMoveInput != Vector3.zero)
+            {
+                transform.rotation = Quaternion.LookRotation(worldMoveInput);
+            }
+
+            if (controller.isGrounded)
+            {
+                isDoubleJump = true;
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    directionY = jumpForce;
+                }
+            }
+            else
+            {
+                if (Input.GetKeyDown(KeyCode.Space) && isDoubleJump)
+                {
+                    directionY = jumpForce * doubleJump;
+                    isDoubleJump = false;
+                    anim.SetBool("isJumping", true);
+                }
+            }
+            if (Input.GetKey(KeyCode.Space))
+            {
                 anim.SetBool("isJumping", true);
             }
-        }
-        if (Input.GetKey(KeyCode.Space))
-        {
-            anim.SetBool("isJumping", true);
-        }
 
-        else
-        {
-            anim.SetBool("isJumping", false);
-        }
+            else
+            {
+                anim.SetBool("isJumping", false);
+            }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            speed = 20f;
-            anim.SetBool("isSprinting", true);
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                speed = 20f;
+                anim.SetBool("isSprinting", true);
+
+                if (Input.GetMouseButton(0))
+                {
+                    anim.SetTrigger("isRunPunch");
+                    punchTrigger.SetActive(true);
+                }
+                //anim.SetBool("isWalking", false);
+            }
+            else if (Input.GetKeyUp(KeyCode.LeftShift))
+            {
+                speed = 10f;
+                anim.SetBool("isSprinting", false);
+                anim.SetBool("isWalking", true);
+            }
 
             if (Input.GetMouseButton(0))
             {
-                anim.SetTrigger("isRunPunch");
-                punchTrigger.SetActive(true);
+                Debug.Log("Click mouse");
+
+                if (anim.GetBool("isWalking") == true || anim.GetBool("isSprinting") == true)
+                {
+                    Debug.Log("Run punch");
+
+                    anim.SetTrigger("isRunPunch");
+                    punchTrigger.SetActive(true);
+                }
+
+                if (anim.GetBool("isWalking") == false && anim.GetBool("isSprinting") == false)
+                {
+                    Debug.Log("Walk punch");
+
+                    anim.SetTrigger("isPunching");
+                    punchTrigger.SetActive(true);
+                }
             }
-            //anim.SetBool("isWalking", false);
-        }
-        else if (Input.GetKeyUp(KeyCode.LeftShift))
-        {
-            speed = 10f;
-            anim.SetBool("isSprinting", false);
-            anim.SetBool("isWalking", true);
-        }
 
-        if (Input.GetMouseButton(0))
-        {
-            Debug.Log("Click mouse");
 
-            if (anim.GetBool("isWalking") == true || anim.GetBool("isSprinting") == true)
+            else
             {
-                Debug.Log("Run punch");
-
-                anim.SetTrigger("isRunPunch");
-                punchTrigger.SetActive(true);
+                punchTrigger.SetActive(false);
             }
 
-            if (anim.GetBool("isWalking") == false && anim.GetBool("isSprinting") == false)
-            {
-                Debug.Log("Walk punch");
+            directionY -= gravity * Time.deltaTime;
 
-                anim.SetTrigger("isPunching");
-                punchTrigger.SetActive(true);
+            worldMoveInput.y = directionY;
+
+            controller.Move(worldMoveInput * speed * Time.deltaTime);
+
+            if (playerHitPoints <= 0)
+            {
+                SceneManager.LoadScene("DeathScreen");
             }
         }
 
-
+        if (Pause.isPaused)
+        {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
         else
         {
-            punchTrigger.SetActive(false);
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
         }
-
-        directionY -= gravity * Time.deltaTime;
-
-        worldMoveInput.y = directionY;
-
-        controller.Move(worldMoveInput * speed * Time.deltaTime);
-
-        if (playerHitPoints <= 0)
-        {
-            SceneManager.LoadScene("DeathScreen");
-        }
-
 
     }
 
@@ -191,6 +206,20 @@ public class PlayerMovement : MonoBehaviour
             print(playerHitPoints);
             anim.SetBool("isHit", true);
         }
+        if (other.gameObject.tag == "Burger")
+        {
+            if (playerHitPoints >= 100)
+            {
+                healthUp = 0;
+            }
+
+            else
+            {
+                healthUp = 5;
+            }
+            playerHitPoints += healthUp;
+            Destroy(other.gameObject);
+        }
         
     }
     private void OnTriggerExit(Collider other)
@@ -201,21 +230,6 @@ public class PlayerMovement : MonoBehaviour
             
         }
     }
-    //private void OnMouseDown()
-   // {
-       // if (anim.GetBool("isWalking") == true)
-       // {
-       //     anim.SetTrigger("isRunPunch");
-       //     punchTrigger.SetActive(true);
-       // }
-
-       // if (anim.GetBool("isWalking") == false && anim.GetBool("isSprinting") == false)
-       // {
-       //     anim.SetTrigger("isPunching");
-          //  punchTrigger.SetActive(true);
-       // }
-       
-    //}
-    
+   
 
 }
