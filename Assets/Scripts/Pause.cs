@@ -27,6 +27,7 @@ public class Pause : MonoBehaviour
             {
                 PauseOn();
             }
+            
         } 
     }
 
@@ -54,5 +55,12 @@ public class Pause : MonoBehaviour
     {
         Application.Quit();
         Time.timeScale = 1f;
+    }
+
+    public void TryAgain()
+    {
+        SceneManager.LoadScene("SampleScene");
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
 }

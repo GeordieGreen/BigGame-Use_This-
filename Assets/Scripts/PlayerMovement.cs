@@ -26,21 +26,24 @@ public class PlayerMovement : MonoBehaviour
 
     private bool isDoubleJump = false;
 
+    public ParticleSystem dustTrail;
+
     [SerializeField]
     Transform cam;
     
-    // Start is called before the first frame update
+    
     void Start()
     {
         controller = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.visible = false;
+       // Cursor.lockState = CursorLockMode.Locked;
         punchTrigger.SetActive(false);
+        
         
     }
 
-    // Update is called once per frame
+   
     void Update()
     {
         if (!Pause.isPaused)
@@ -53,23 +56,41 @@ public class PlayerMovement : MonoBehaviour
             if (Input.GetKey(KeyCode.W))
             {
                 anim.SetBool("isWalking", true);
+                
             }
             else if (Input.GetKey(KeyCode.S))
             {
                 anim.SetBool("isWalking", true);
+               
             }
             else if (Input.GetKey(KeyCode.A))
             {
                 anim.SetBool("isWalking", true);
+                
             }
             else if (Input.GetKey(KeyCode.D))
             {
                 anim.SetBool("isWalking", true);
+                
             }
             else
             {
                 anim.SetBool("isWalking", false);
             }
+            if (anim.GetBool("isWalking") == false || anim.GetBool("isJumping") == true)
+            {
+                dustTrail.Stop();
+            }
+            else if (anim.GetBool("isWalking") == true)
+            {
+                dustTrail.Play();
+                
+                if (anim.GetBool("isSprinting") == true)
+                {
+                    dustTrail.Play();
+                }
+            }
+            
 
             Vector3 rightWorldMovement = cam.transform.right;
             Vector3 forwardWorldMovement = cam.transform.forward;
@@ -85,10 +106,12 @@ public class PlayerMovement : MonoBehaviour
 
             if (controller.isGrounded)
             {
+                
                 isDoubleJump = true;
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
                     directionY = jumpForce;
+                    
                 }
             }
             else
@@ -98,6 +121,7 @@ public class PlayerMovement : MonoBehaviour
                     directionY = jumpForce * doubleJump;
                     isDoubleJump = false;
                     anim.SetBool("isJumping", true);
+                    
                 }
             }
             if (Input.GetKey(KeyCode.Space))
@@ -165,6 +189,8 @@ public class PlayerMovement : MonoBehaviour
             if (playerHitPoints <= 0)
             {
                 SceneManager.LoadScene("DeathScreen");
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
             }
         }
 
@@ -194,6 +220,7 @@ public class PlayerMovement : MonoBehaviour
             if (coinCounter == 3)
             {
                SceneManager.LoadScene("EndGame");
+               
             }
             else
             {
@@ -205,6 +232,7 @@ public class PlayerMovement : MonoBehaviour
             playerHitPoints -= playerDamage;
             print(playerHitPoints);
             anim.SetBool("isHit", true);
+            
         }
         if (other.gameObject.tag == "Burger")
         {
