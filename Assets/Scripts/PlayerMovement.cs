@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
 
     public int playerHitPoints = 100;
     [SerializeField] int playerDamage = 10;
+    [SerializeField] int waterDamage = 100;
     [SerializeField] int healthUp = 5;
     [SerializeField] float speed = 5.0f;
 
@@ -77,18 +78,13 @@ public class PlayerMovement : MonoBehaviour
             {
                 anim.SetBool("isWalking", false);
             }
-            if (anim.GetBool("isWalking") == false || anim.GetBool("isJumping") == true)
-            {
-                dustTrail.Stop();
-            }
-            else if (anim.GetBool("isWalking") == true)
+            if (anim.GetBool("isWalking") == true)
             {
                 dustTrail.Play();
-                
-                if (anim.GetBool("isSprinting") == true)
-                {
-                    dustTrail.Play();
-                }
+            }
+            else if (anim.GetBool("isJumping") == true || anim.GetBool("isWalking") == false)
+            {
+                dustTrail.Stop();
             }
             
 
@@ -121,7 +117,7 @@ public class PlayerMovement : MonoBehaviour
                     directionY = jumpForce * doubleJump;
                     isDoubleJump = false;
                     anim.SetBool("isJumping", true);
-                    
+                    anim.SetBool("isWalking", false);
                 }
             }
             if (Input.GetKey(KeyCode.Space))
@@ -233,6 +229,10 @@ public class PlayerMovement : MonoBehaviour
             print(playerHitPoints);
             anim.SetBool("isHit", true);
             
+        }
+        if (other.tag == "Water")
+        {
+            playerHitPoints -= waterDamage;
         }
         if (other.gameObject.tag == "Burger")
         {

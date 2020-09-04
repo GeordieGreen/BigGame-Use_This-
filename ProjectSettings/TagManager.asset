@@ -10,6 +10,7 @@ TagManager:
   - Enemy
   - Punch
   - Burger
+  - Water
   layers:
   - Default
   - TransparentFX
