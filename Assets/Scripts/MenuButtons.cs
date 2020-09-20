@@ -27,8 +27,15 @@ public class MenuButtons : MonoBehaviour
 
     public void TryAgain()
     {
+        //Reset.coinCounter = 0;
+        //Reset.playerHitPoints = 100;
         SceneManager.LoadScene("SampleScene");
-        Reset.coinCounter = 0;
-        Reset.playerHitPoints = 100;
+        
+    }
+    public void EnterGameOver()
+    {
+        SceneManager.LoadScene("DeathScreen");
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
 }

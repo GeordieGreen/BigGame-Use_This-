@@ -33,12 +33,13 @@ public class PlayerMovement : MonoBehaviour
     Transform cam;
     
     
+    
     void Start()
     {
         controller = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
-        //Cursor.visible = false;
-       // Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+      //Cursor.lockState = CursorLockMode.Locked;
         punchTrigger.SetActive(false);
         
         
@@ -78,13 +79,15 @@ public class PlayerMovement : MonoBehaviour
             {
                 anim.SetBool("isWalking", false);
             }
-            if (anim.GetBool("isWalking") == true)
+            if (!dustTrail.isPlaying && anim.GetBool("isWalking") == true)
             {
                 dustTrail.Play();
+                Debug.Log("Dust Trail");
             }
-            else if (anim.GetBool("isJumping") == true || anim.GetBool("isWalking") == false)
+            else if (dustTrail.isPlaying && (anim.GetBool("isJumping") == true || anim.GetBool("isWalking") == false))
             {
                 dustTrail.Stop();
+                Debug.Log("NO Dust Trail");
             }
             
 
@@ -184,22 +187,11 @@ public class PlayerMovement : MonoBehaviour
 
             if (playerHitPoints <= 0)
             {
-                SceneManager.LoadScene("DeathScreen");
-                Cursor.visible = true;
-                Cursor.lockState = CursorLockMode.None;
+                FindObjectOfType<MenuButtons>().EnterGameOver();
             }
         }
 
-        if (Pause.isPaused)
-        {
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
-        }
-        else
-        {
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
-        }
+        
 
     }
 
